@@ -2,7 +2,7 @@
 
 # MAVLink
 
-MAVLink（Micro Air Vehicle Link）是一种用于与小型无人机通信的协议。它被设计为一个header-only消息封送处理库。MAVLink由Lorenz Meier在LGPL许可下于2009年初发布。
+MAVLink（Micro Air Vehicle Link）是一种用于与小型无人机通信的协议。它被设计为一个header-only消息封送处理库。MAVLink由Lorenz Meier在LGPL许可下[2]于2009[1]年初发布。
 
 PS. header-only库是一种“无需编译，包含头文件就可以用”的库。
 
@@ -29,7 +29,7 @@ MAVLink主要用于地面控制站(GCS,  Ground Control Station)与无人机之�
 
 PS. 0xFE = 254，即一个十进制值为254的字节标识着一个新的MAVLink消息包的开始。
 
-版本2之后，包结构扩展为以下：
+版本2之后，包结构扩展为以下[3]：
 
 | 字段名                                | 索引（以字节作为长度单位）   | 目的                                       |
 | ---------------------------------- | --------------- | ---------------------------------------- |
@@ -49,13 +49,13 @@ PS. 0xFD = 253
 
 ### CRC字段
 
-详见原文。
+详见原文。[4]\[5]\[6]\[7]\[8]
 
 该字段主要用于确保消息包的完整性。MAVLink的循环冗余检查算法已经在Python和Java等多种语言中实现。
 
 ### 消息
 
-上述数据包中的__有效__负载就是MAVLink消息。每条消息都由包上的ID字段进行标识，有效负载包含来自消息的数据。MAVlink源码中的XML文档定义了存储在此有效负载中的数据。
+上述数据包中的__有效__负载就是MAVLink消息。每条消息都由包上的ID字段进行标识，有效负载包含来自消息的数据。MAVlink源码[9]中的XML文档定义了存储在此有效负载中的数据。
 
 下面是从XML文档中提取的ID为24的消息。
 
@@ -75,8 +75,22 @@ PS. 0xFD = 253
 </message>
 ```
 
-注意：XML文档描述了协议字段的逻辑顺序。实际的连线格式（以及典型的内存表示）对字段重新排序，以减少数据结构对齐问题。在阅读从消息定义生成的代码时，这可能会造成混淆。
+注意：XML文档描述了协议字段的逻辑顺序。实际的连线格式（以及典型的内存表示）对字段重新排序[10]，以减少数据结构对齐问题。在阅读从消息定义生成的代码时，这可能会造成混淆。
 
 ### MAVLink生态圈
 
-MAVLink在很多项目中作为通信协议使用，这可能意味着它们之间存在一定的兼容性。有人已经编写了一个有趣的教程来解释MAVLink的基础知识。
+MAVLink在很多项目中作为通信协议使用，这可能意味着它们之间存在一定的兼容性。有人已经编写了一个有趣的教程[11]来解释MAVLink的基础知识。
+
+## 参考
+
+1.  ["Initial commit · mavlink/mavlink@a087528"](https://github.com/mavlink/mavlink/commit/a087528b8146ddad17e9f39c1dd0c1353e5991d5). *GitHub*.
+2. **^** [http://qgroundcontrol.org/mavlink/start](http://qgroundcontrol.org/mavlink/start)
+3. **^** ["Serialization · MAVLink Developer Guide"](https://mavlink.io/en/guide/serialization.html). *mavlink.io*. Retrieved 2019-08-22.
+4. **^** [http://qgroundcontrol.org/mavlink/crc_extra_calculation](http://qgroundcontrol.org/mavlink/crc_extra_calculation)
+5. **^** ["GitHub - ArduPilot/pymavlink: python MAVLink interface and utilities"](https://github.com/ArduPilot/pymavlink). August 18, 2019 – via GitHub.
+6. **^** ["GitHub - arthurbenemann/droidplanner: Ground Control Station for Android Devices"](https://github.com/arthurbenemann/droidplanner). July 2, 2019 – via GitHub.
+7. **^** ["A Java code generator and a Java library for MAVLink: ghelle/MAVLinkJava"](https://github.com/ghelle/MAVLinkJava). August 4, 2019 – via GitHub.
+8.  ["GitHub - dronefleet/mavlink: A Java API for MAVLink communication"](https://github.com/dronefleet/mavlink). August 2, 2019 – via GitHub.
+9. **^** ["GitHub - mavlink/mavlink: Marshalling / communication library for drones"](https://github.com/mavlink/mavlink). August 20, 2019 – via GitHub.
+10. **^**[http://qgroundcontrol.org/mavlink/crc_extra_calculation#field_reordering](http://qgroundcontrol.org/mavlink/crc_extra_calculation#field_reordering)
+11. **^** Posted by Shyam Balasubramanian on November 15, 2013 at 2:36pm in ArduCopter User Group; Discussions, Back to ArduCopter User Group. ["MAVLink Tutorial for Absolute Dummies (Part –I)"](https://diydrones.com/forum/topics/mavlink-tutorial-for-absolute-dummies-part-i?groupUrl=arducopterusergroup). *diydrones.com*.
