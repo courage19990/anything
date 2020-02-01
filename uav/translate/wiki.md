@@ -21,8 +21,8 @@ MAVLink主要用于地面控制站(GCS,  Ground Control Station)与无人机之�
 | 起始标识 | 0             | 表示帧传输的开始（v1.0: 0xFE）                     |
 | 负载长度 | 1             | 有效负载的长度（n）                               |
 | 包序号  | 2             | 每个组件都会计算它们各自的发送序号（每发送一个消息包，包序号加1），允许接收端通过包序号来检测丢包率。 |
-| 系统ID | 3             | 用于唯一标识某网络中的一个发送系统。允许在同一网络上区分不同的系统。       |
-| 组件ID | 4             | 用于唯一标识某网络中的一个发送组件。允许区分同一系统的不同组件，例如IMU和自动驾驶仪（即飞控）。 |
+| 系统ID | 3             | 用于区分发送系统。可区分在同一网络上不同的系统。                 |
+| 组件ID | 4             | 用于区分发送组件。可区分同一系统的不同组件，例如IMU和自动驾驶仪（即飞控）。  |
 | 消息ID | 5             | 标识消息类型——定义有效负载的“含义”以及如何正确解码有效负载。         |
 | 有效负载 | 6 到 (n+6)     | 消息包中的数据，其含义取决于消息类型。                      |
 | CRC  | (n+7) 到 (n+8) | 整个包的校验和，不包括包的起始标识（LSB to MSB）            |
@@ -38,8 +38,8 @@ PS. 0xFE = 254，即一个十进制值为254的字节标识着一个新的MAVLin
 | 不兼容性标志（ incompatibility flag__s__） | 2               | 不兼容性标志用于指示MAVLink库必须支持的特性，如果某个MAVLink实现无法理解incompat_flags字段中的任一标志（flag），则它必须丢弃数据包。 |
 | 兼容性标志                              | 3               | MAVLink实现可以安全地忽略compat_flags字段中它不理解的标志。  |
 | 包序号                                | 4               | 每个组件都会计算它们各自的发送序号（每发送一个消息包，包序号加1），允许接收端通过包序号来检测丢包率。 |
-| 系统ID                               | 5               | 用于唯一标识某网络中的一个发送系统。允许在同一网络上区分不同的系统。       |
-| 组件ID                               | 6               | 用于唯一标识某网络中的一个发送组件。允许区分同一系统的不同组件，例如IMU和自动驾驶仪（即飞控）。 |
+| 系统ID                               | 5               | 用于区分发送系统。可区分在同一网络上不同的系统。                 |
+| 组件ID                               | 6               | 用于区分发送组件。可区分同一系统的不同组件，例如IMU和自动驾驶仪（即飞控）。  |
 | 消息ID                               | 7 到 9           | 标识消息类型——定义有效负载的“含义”以及如何正确解码有效负载。         |
 | 有效负载                               | 10 到 (n+10)     | 消息包中的数据，其含义取决于消息类型。                      |
 | CRC                                | (n+11) 到(n+12)  | 整个包的校验和，不包括包的起始标识（LSB to MSB）            |
@@ -84,13 +84,13 @@ MAVLink在很多项目中作为通信协议使用，这可能意味着它们之�
 ## 参考
 
 1.  ["Initial commit · mavlink/mavlink@a087528"](https://github.com/mavlink/mavlink/commit/a087528b8146ddad17e9f39c1dd0c1353e5991d5). *GitHub*.
-2. **^** [http://qgroundcontrol.org/mavlink/start](http://qgroundcontrol.org/mavlink/start)
-3. **^** ["Serialization · MAVLink Developer Guide"](https://mavlink.io/en/guide/serialization.html). *mavlink.io*. Retrieved 2019-08-22.
-4. **^** [http://qgroundcontrol.org/mavlink/crc_extra_calculation](http://qgroundcontrol.org/mavlink/crc_extra_calculation)
-5. **^** ["GitHub - ArduPilot/pymavlink: python MAVLink interface and utilities"](https://github.com/ArduPilot/pymavlink). August 18, 2019 – via GitHub.
-6. **^** ["GitHub - arthurbenemann/droidplanner: Ground Control Station for Android Devices"](https://github.com/arthurbenemann/droidplanner). July 2, 2019 – via GitHub.
-7. **^** ["A Java code generator and a Java library for MAVLink: ghelle/MAVLinkJava"](https://github.com/ghelle/MAVLinkJava). August 4, 2019 – via GitHub.
+2.  **^** [http://qgroundcontrol.org/mavlink/start](http://qgroundcontrol.org/mavlink/start)
+3.  **^** ["Serialization · MAVLink Developer Guide"](https://mavlink.io/en/guide/serialization.html). *mavlink.io*. Retrieved 2019-08-22.
+4.  **^** [http://qgroundcontrol.org/mavlink/crc_extra_calculation](http://qgroundcontrol.org/mavlink/crc_extra_calculation)
+5.  **^** ["GitHub - ArduPilot/pymavlink: python MAVLink interface and utilities"](https://github.com/ArduPilot/pymavlink). August 18, 2019 – via GitHub.
+6.  **^** ["GitHub - arthurbenemann/droidplanner: Ground Control Station for Android Devices"](https://github.com/arthurbenemann/droidplanner). July 2, 2019 – via GitHub.
+7.  **^** ["A Java code generator and a Java library for MAVLink: ghelle/MAVLinkJava"](https://github.com/ghelle/MAVLinkJava). August 4, 2019 – via GitHub.
 8.  ["GitHub - dronefleet/mavlink: A Java API for MAVLink communication"](https://github.com/dronefleet/mavlink). August 2, 2019 – via GitHub.
-9. **^** ["GitHub - mavlink/mavlink: Marshalling / communication library for drones"](https://github.com/mavlink/mavlink). August 20, 2019 – via GitHub.
-10. **^**[http://qgroundcontrol.org/mavlink/crc_extra_calculation#field_reordering](http://qgroundcontrol.org/mavlink/crc_extra_calculation#field_reordering)
-11. **^** Posted by Shyam Balasubramanian on November 15, 2013 at 2:36pm in ArduCopter User Group; Discussions, Back to ArduCopter User Group. ["MAVLink Tutorial for Absolute Dummies (Part –I)"](https://diydrones.com/forum/topics/mavlink-tutorial-for-absolute-dummies-part-i?groupUrl=arducopterusergroup). *diydrones.com*.
+9.  **^** ["GitHub - mavlink/mavlink: Marshalling / communication library for drones"](https://github.com/mavlink/mavlink). August 20, 2019 – via GitHub.
+10.  **^**[http://qgroundcontrol.org/mavlink/crc_extra_calculation#field_reordering](http://qgroundcontrol.org/mavlink/crc_extra_calculation#field_reordering)
+11.  **^** Posted by Shyam Balasubramanian on November 15, 2013 at 2:36pm in ArduCopter User Group; Discussions, Back to ArduCopter User Group. ["MAVLink Tutorial for Absolute Dummies (Part –I)"](https://diydrones.com/forum/topics/mavlink-tutorial-for-absolute-dummies-part-i?groupUrl=arducopterusergroup). *diydrones.com*.
