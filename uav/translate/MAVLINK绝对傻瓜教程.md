@@ -24,36 +24,28 @@ Mavlink消息基本上是由Mission Planner（MP）编码，并通过USB串行�
 ```
 
 ```
-6 bytes header
+长度为6个字节的首部 header
 0. message header, 永远为 0xFE
 1. message length (9)
 2. sequence number -- 在 255 和 0 之间轮转(0x4e，前一个是 0x4d)
 3. System ID - 什么系统在发送这个消息 (1)
 4. Component ID- 系统的哪个组件正在发送消息 (1)
-5. Message ID (e.g. 0 = heartbeat and many more! Don’t be shy, you can add too..)
-Variable Sized Payload (specified in octet 1, range 0..255)
-** Payload (the actual data we are interested in)
-Checksum: 用于错误检测
+5. Message ID (例如 0 = heartbeat 等等! 别害羞，你也可以添加..)
+
+可变长的有效负载 Payload (由八位组构成, 范围是 0..255)
+** Payload (我们真正感兴趣的实际数据)
+
+校验和 Checksum: 用于错误检测
 ```
 
+PS. “由八位组构成”原文中是specified in octet 1
 
+该软件所做的是检查它是否为一个有效的消息（通过检查校验和判断是否已损坏，如果是，则丢弃消息）。这就是为什么遥测的波特率设置为57,600而不是115,200个基点的原因之一。
 
+这就是为什么遥测波的特率设置为57600而不是115200bps的原因之一。
 
+它越低，它容易发生的错误就越少，虽然它更新到地面站的速度会慢一些。
 
+如果你想与MavLink取得更大的距离，进一步降低波特率可能是一个好主意。
 
-
-
-6 bytes header
-
-0. message header, always 0xFE
-1. message length (9)
-2. sequence number -- rolls around from 255 to 0 (0x4e, previous was 0x4d)
-3. System ID - what system is sending this message (1)
-4. Component ID- what component of the system is sending the message (1)
-5. Message ID (e.g. 0 = heartbeat and many more! Don’t be shy, you can add too..)
-   Variable Sized Payload (specified in octet 1, range 0..255)
-   ** Payload (the actual data we are interested in)
-   Checksum: For error detection. '
-
-
-
+然而，需要注意的是，测试的波特率为57,600 bps，理论上，3DR遥测无线电可以覆盖大约一英里的半径范围。还记得高中时的信噪比(SNIR)概念吗?
