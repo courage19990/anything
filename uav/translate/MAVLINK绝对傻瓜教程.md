@@ -1,4 +1,4 @@
-本文翻译自__Shyam Balasubramanian__所写的__MavLink Tutorial for Absolute Dummies (Part –I) __，仅供学习交流。
+本文翻译自__Shyam Balasubramanian__所写的__MavLink Tutorial for Absolute Dummies (Part –I) __，仅供学习与交流。
 
 # MAVLink绝对傻瓜教程（Part –I）
 
