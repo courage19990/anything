@@ -4,7 +4,7 @@
 
 __MavLink__是什么鬼？它是一种通信协议。当看到这个概念后，大伙就开始畏惧它。这个教程将迫使你深刻地领悟它，并通俗易懂地阐述它究竟是什么，它是如何工作的，最重要的是它到底是如何工作的！！我将试着解释Mission Planner如何与APM/ PX4通信，反之亦然。这将有助于你的扩展，并激发你潜在的天才程序员天赋，如果你还没激发的话！！
 
-PS. Mission Planner是一款开源的无人机地面站软件，APM/ PX4则分别为两种飞控固件（类似于windows和linux的关系）而pixhawk是飞控硬件，可以安装上述两种固件中的一个。
+PS. Mission Planner是一款开源的无人机地面站软件，APM/ PX4则分别为两种飞控固件（类似于windows和linux的关系）。而pixhawk是飞控硬件，它可以安装上述两种固件中的任何一个。
 
 本教程假定：
 
@@ -16,7 +16,7 @@ PS. Mission Planner是一款开源的无人机地面站软件，APM/ PX4则分�
 
 ## 我为你而来，MavLink
 
-Mavlink消息基本上是由Mission Planner（MP）编码，并通过USB串行或遥测发送到APM的一个字节流（两者不能同时使用。如果同时插入，则优先选择USB，而忽略遥测）。这里的__编码__并没有什么特别之处，只是把数据包放入一个数据结构中，然后通过信道以字节的形式发送出去，同时加上一些错误纠正。
+Mavlink消息基本上是由Mission Planner（MP）编码，并通过USB串行或遥测__发送到APM__的一个字节流（两者不能同时使用。如果同时插入，则优先选择USB，而忽略遥测）。这里的__编码__并没有什么特别之处，只是把数据包放入一个数据结构中，然后通过信道以字节的形式发送出去，同时加上一些错误纠正。
 
 ## MavLink消息的结构：
 
@@ -43,7 +43,7 @@ Mavlink消息基本上是由Mission Planner（MP）编码，并通过USB串行�
 
 PS. “由八位组构成”在原文中是specified in octet 1
 
-软件所做的事情是，检查它是否为一个有效的消息（通过检查Checksum判断消息是否已损坏，丢弃已经损坏的消息）。这是遥测的波特率为什么设置为57,600而不是115,200 bps的原因之一。该数值越低，软件容易发生的错误就越少，虽然消息更新到地面站的速度会慢一些。如果你想在采用MavLink协议的同时取得更远点的距离，进一步降低波特率可能是一个好主意。然而，需要注意的是，经过测试，57,600bps在理论上可以通过3DR遥测无线电提供大约一英里半径的覆盖范围。还记得高中时的信噪比（SNIR）的概念吗?
+（APM）软件所做的事情是，检查它是否为一个有效的消息（通过检查Checksum判断消息是否已损坏，丢弃已经损坏的消息）。这是遥测的波特率为什么设置为57,600而不是115,200 bps的原因之一。该数值越低，软件容易发生的错误就越少，虽然消息更新到地面站的速度会慢一些。如果你想在采用MavLink协议的同时取得更远点的距离，进一步降低波特率可能是一个好主意。然而，需要注意的是，经过测试，57,600bps在理论上可以通过3DR遥测无线电提供大约一英里半径的覆盖范围。还记得高中时的信噪比（SNIR）的概念吗?
 
 现在，根据上面的内容，我们感兴趣的东西是：
 
@@ -62,17 +62,17 @@ MavLink啥也不是就是一条消息。MavLink也可以用于地面机器人，
 
 1. 我们有一个名为handlemessage (msg)的方法。这个就是你需要学习和了解的方法！在GCS_MavLink.pde中找到它（在Arducopter/ ArduPlane里）。
 
-   PS. GCS_MavLink.pde现在似乎是这个https://github.com/ArduPilot/ardupilot/blob/8f550ffdd48a3165c115ca24d6ce5227a5f826d1/ArduCopter/GCS_Mavlink.cpp
+   PS. 该方法隶属APM固件的源代码。GCS_MavLink.pde现在似乎是这个https://github.com/ArduPilot/ardupilot/blob/8f550ffdd48a3165c115ca24d6ce5227a5f826d1/ArduCopter/GCS_Mavlink.cpp
 
    它基本上是在问信息包：嘿，你是谁？你是为我而来还是试图侵入我的系统？在我给予你许可之前，让我先读一下你的__系统ID和组件ID__。<u>任何使用MavLink的系统都有一个系统ID和组件ID</u>。例如，你的MP和正在飞行的四轴飞行器将具有相同的系统ID。组件ID则用于附加到APM/PX4的“子系统”。
 
    注意：当前，系统ID和组件ID被__<u>硬编码</u>__为相同的。
 
-   现在，你仅有一个遥测和一架带着APM的直升机，就是这样，去愉快地飞行吧-不用再考虑其它的！这些东西对多直升机也许有帮助（在未来），未来将会有不同的系统ID🙂
+   现在，你仅有一个遥测和一架安装了APM的直升机，就是这样，去愉快地飞行吧-不用再考虑其它的！这些东西对多直升机有帮助（在未来），未来将会有不同的系统ID🙂
 
 2. 我们从消息中提取有效负载并放入一个__包（packet）__中。包是基于一种“信息类型”的数据结构。我们将不再使用“消息”一词，那玩意儿到这里就结束了。我们基本上只对由“原始数据”打包而成的包感兴趣。
 
-3. 包被放入一个“适当的数据结构”中。有许多数据结构 ，例如用来存放姿态（俯仰，横摇，偏航方向）的、GPS的、无线电控制信道的，等等，也就是，把相似的东西组合在一起，形成易于理解的模块。这些数据结构在发送端和接收端（即在MP和APM端）__“100%完全相同”__。 如果不一样的话，你的直升机就会在奇怪的时间坠毁！
+3. 包被放入一个“适当的数据结构”中。有许多数据结构 ，例如用来存放姿态（俯仰，横摇，偏航方向）的、GPS的、无线电控制信道的，等等，也就是，把相似的东西组合在一起，形成易于理解的模块。这些数据结构在发送端和接收端（即在MP端和APM端）__“100%完全相同”__。 如果不一样的话，你的直升机就会在奇怪的时间坠毁！
 
 PS. 无线电控制信道原文中为RC channel
 
@@ -90,80 +90,123 @@ PS. 无线电控制信道原文中为RC channel
 
 截至2013年11月，在Arducopter最新的3.0.1 RC5（候选版本）中，以下是你可能看到的参数。我已经试着列出所有可能的MavLink消息的“主消息”ID。
 
-请注意，在每个“主消息”类别中(如下面粗体部分)你会找到属于那个类别的“子消息”，它们基本上与有效负载信息（真正的肉）及其处理方式密切相关。就像“自行车”类别有雅马哈，铃木，哈雷戴维森等。我列出了所有的主要信息类别，但只指定了一些子类别。你可以自己查一下细节🙂因为如果你明白我到目前为止的意思，你就不再是个傻瓜了。明白我的意思吗？
+请注意，在每个“主消息”类别中（如粗体部分下面的东西）你会找到属于那个类别的“子消息”，它们基本上与有效负载信息（真正的肉）及其处理方式密切相关。就像“自行车”类别有雅马哈，铃木，哈雷戴维森等。我列出了所有的主要信息类别，但只指定了一些子类别。你可以自己查一下细节🙂因为如果你明白我到目前为止的意思，你就不再是个傻瓜了。明白我的意思吗？
 
 __MAVLINK_MSG_ID__（主消息块）：
 
 1. MAVLINK_MSG_ID_HEARTBEAT：//0
-   * 这是__最重要的信息__。GCS不断地向APM/PX4发送信息，以确定它是否与之相连（每1秒一次）。这是为了确保在更新某些参数时MP与APM是同步的。如果错过了许多心跳信号，则会触发故障保护（可能），接着直升机可能着陆、继续执行任务或返回发射（Returns to launch，也称为RTL）。在MP的“配置/设置故障保护选项”下，可以启用/禁用故障保护选项。但你不能停止心跳，对吗？这个名字很有道理！!
+
+   这是__最重要的信息__。GCS不断地向APM/PX4发送信息，以确定它是否与之相连（每1秒一次）。这是为了确保在更新某些参数时MP与APM是同步的。如果错过了许多心跳信号，则会触发故障保护（可能），接着直升机可能着陆、继续执行任务或返回发射（Returns to launch，也称为RTL）。在MP的“配置/设置故障保护选项”下，可以启用/禁用故障保护选项。但你不能停止心跳，对吗？这个名字很有道理！!
 
 2. MAVLINK_MSG_ID_REQUEST_DATA_STREAM：//66
-   * 传感器，无线电控制信道，GPS位置，状态，Extra 1/2/3 
+
+   传感器，无线电控制信道，GPS位置，状态，Extra 1/2/3 
 
 3. MAVLINK_MSG_ID_COMMAND_LONG：//76 
 
-   * 无限制游荡（Loiter unlimited），RTL，着陆，任务开始（Mission start），飞控解锁/锁定（Arm/Disarm ），重新启动（Reboot）。
+   无限制悬停（Loiter unlimited），RTL，着陆，任务开始（Mission start），飞控解锁/锁定（Arm/Disarm ），重新启动（Reboot）。
 
    PS. 例如在航前检查未通过时是禁止直接用commander arm对飞控解锁的。
 
 4. SET_MODE： //11 
 
-   * 例如set_mode (packet.custom_mode);
+   E.g. set_mode(packet.custom_mode); 
 
 5. MAVLINK_MSG_ID_MISSION_REQUEST_LIST： //43 
 
-   * ~~总路径点（waypoints）：command_total参数变量。它存储着当前存在路径点的总数量（除了多直升机情况下home的位置）~~
+   Total waypoints: command_total variable of parameters. This stores the total number
+   of waypoints that are present (except home location, for multi-copters) 
 
 6. MAVLINK_MSG_ID_MISSION_REQUEST： //40 
 
+   Set of MAV_CMD value enum members, such as: (MAV_CMD_)CHANGE_ALT, SET_HOME,
+   CONDITION_YAW, TAKE_OFF, NAV_LOITER_TIME 
+
 7. MAVLINK_MSG_ID_MISSION_ACK： //47 
+
+   // turn off waypoint send 
 
 8. MAVLINK_MSG_ID_PARAM_REQUEST_LIST： //21 
 
+   count_parameters (Count the total parameters) 
+
 9. MAVLINK_MSG_ID_PARAM_REQUEST_READ： //20 
+
+   Receive and decode parameters (Make sense of Param name and Id) 
 
 10. MAVLINK_MSG_ID_MISSION_CLEAR_ALL： //45 
 
-11. MAVLINK_MSG_ID_MISSION_SET_CURRENT： //41 
+   When you use mission planner flight data screen and say, Clear Mission with the mouse menu, this is where it goes. It clears the EEPROM memory from the APM/PX4.
 
-12. MAVLINK_MSG_ID_MISSION_COUNT： // 44 
+11.  MAVLINK_MSG_ID_MISSION_SET_CURRENT： //41 
 
-13. MAVLINK_MSG_ID_MISSION_WRITE_PARTIAL_LIST： // 
+    This is used to change active command during mid mission. E.g. when you click on MP google map screen and click ‘Fly To Here’, as an example.
 
-14. MAVLINK_MSG_ID_SET_MAG_OFFSETS： //151 
 
-15. MAVLINK_MSG_ID_MISSION_ITEM： //39 
+12.  MAVLINK_MSG_ID_MISSION_COUNT： // 44 
 
-   这部分很有趣！此消息包含用于执行实时操作的子消息，比如设置航点以及高级功能等。其工作原理如下：
+    Save the total number of waypoints (excluding home location) -> for Multicopters. 
 
-*  从GCS接收一个航点（WP），并将其存储在APM/PX4的EEPROM中
 
-*  发送4个参数。这些参数在code + Options中定义为Enum。每个命令(或ID)可能有不同的参数。任务计划显示“空白”列标题，因为没有为这个ID定义参数。
+13.  MAVLINK_MSG_ID_MISSION_WRITE_PARTIAL_LIST： // 
 
-      总结一下，每个动作都会发送以下有趣的参数:
+    Just keeping a global variable stating that APM is receiving commands now. This is to avoid other MavLink actions while important parameters are being set.
 
-      4个参数+ID（动作）+（Lat，Long，Alt）定义了直升机的3D位置。注意，4参数可以是一些自定义的动作，如相机设置，相机触发，游荡时间等。
+14.   MAVLINK_MSG_ID_SET_MAG_OFFSETS： //151 
 
-   * 如下图所示，每个ID定义一个航路点（AFAIK）。LOITER_TIME，LOITER_UNLIMITED，WAYPOINT都是随其他参数（纬度、经度和高度）一起发送的航路点，因为每个参数都保存为APM/PX4中的一个航路点。期间
+     Set the mag_ofs_x, mag_ofs_y, mag_ofs_z, say after compass calibration to EEPROM of APM/PX4. Mission Planner (MP) automatically does this or you can do this too by going to Full Parameters List under SOFTWARE CONFIGURATION.
 
-   * 请记住:在当前的设计中，高度总相对于home高度而言的(总是!)
 
-   * 您可以在Common.xml中定义“这些操作”，并使用Python GUI生成器生成APM/PX4将使用的代码。让我稍后谈到这一点，或者在论坛中问我如何做。我提到过，您可以为(4个参数)添加自己感兴趣的参数。
+15.   MAVLINK_MSG_ID_MISSION_ITEM： //39 
 
-   * 当APM收到这个' main '命令时，它从MavLink包中读取ID并对ID执行switch(case)操作。
+     这部分很有趣！此消息包含用于执行实时操作的子消息，比如设置航点以及高级功能等。其工	作原理如下：从GCS接收一个航点（WP），并将其存储在APM/PX4的EEPROM中
 
-   * 磨合匝数、设定起始时间、磨合时间、重复伺服、设定伺服等。
+     发送4个参数。这些参数在code + Options中定义为Enum。每个命令(或ID)可能有不同的参数。任务计划显示“空白”列标题，因为没有为这个ID定义参数。
 
-16. MAVLINK_MSG_ID_PARAM_SET： //23 
-17. MAVLINK_MSG_ID_RC_CHANNELS_OVERRIDE： //70 
-18. MAVLINK_MSG_ID_HIL_STATE： //90 
-19. MAVLINK_MSG_ID_DIGICAM_CONFIGURE： // 
-20. MAVLINK_MSG_ID_MOUNT_CONFIGURE： // 
-21. MAVLINK_MSG_ID_MOUNT_CONTROL： // 
-22. MAVLINK_MSG_ID_MOUNT_STATUS：// 
-23. MAVLINK_MSG_ID_RADIO, MAVLINK_MSG_ID_RADIO_STATUS： // 
-    * 观察遥测/USB的包速率，当信号强度低于预期或误差越来越大时，自动调整发送接收包之间的延迟。它就像一个自适应的软件流程控制。查看c++中的_mavlink_radio_t （APM代码）或mavlink_radio_t （c#，MP）代码。两者都被定义为结构体
+     总结一下，每个动作都会发送以下有趣的参数:
 
+     4个参数+ID（动作）+（Lat，Long，Alt）定义了直升机的3D位置。注意，4参数可以是一些            自定义的动作，如相机设置，相机触发，游荡时间等。   
+
+     如下图所示，每个ID定义一个航路点（AFAIK）。LOITER_TIME，LOITER_UNLIMITED，WAYPOINT都是随其他参数（纬度、经度和高度）一起发送的航路点，因为每个参数都保存为APM/PX4中的一个航路点。期间
+
+     请记住:在当前的设计中，高度总相对于home高度而言的(总是!)
+
+     您可以在Common.xml中定义“这些操作”，并使用Python GUI生成器生成APM/PX4将使用的代码。让我稍后谈到这一点，或者在论坛中问我如何做。我提到过，您可以为(4个参数)添加自己感兴趣的参数。
+
+     <img src="rs/dummy.png" />
+
+     当APM收到这个' main '命令时，它从MavLink包中读取ID并对ID执行switch(case)操作。
+
+     磨合匝数、设定起始时间、磨合时间、重复伺服、设定伺服等。
+16.  MAVLINK_MSG_ID_PARAM_SET： //23 
+
+    设置参数。记住，我们可以在任务规划器中为参数设置一个值（比如说“完整参数列表”），这就是我们执行此操作的目的。APM发送数据值集进行确认。你看到MP说“值设置失败”了吗？另外，APM/PX4同时记录这个值，用于离线分析
+
+
+17.  MAVLINK_MSG_ID_RC_CHANNELS_OVERRIDE： //70 
+
+    覆盖RC通道值为HIL(硬件在环仿真)或完整的GCS控制开关位置通过GUI(我还没有尝试过)!
+
+
+18.  MAVLINK_MSG_ID_HIL_STATE： //90 
+
+    用于HIL仿真。这是一个虚拟现实与您的直升机/飞机。
+
+
+19.  MAVLINK_MSG_ID_DIGICAM_CONFIGURE： // 
+
+20.  MAVLINK_MSG_ID_MOUNT_CONFIGURE： // 
+
+21.  MAVLINK_MSG_ID_MOUNT_CONTROL： // 
+
+22.  MAVLINK_MSG_ID_MOUNT_STATUS：// 
+
+    到目前为止，正如其名称所暗示的，配置用户设置的适当命令设置。
+
+
+23.  MAVLINK_MSG_ID_RADIO, MAVLINK_MSG_ID_RADIO_STATUS： // 
+
+    观察遥测/USB的包速率，当信号强度低于预期或误差越来越大时，自动调整发送接收包之间的延迟。它就像一个自适应的软件流程控制。查看c++中的_mavlink_radio_t （APM代码）或mavlink_radio_t （c#，MP）代码。两者都被定义为结构体
 ## 四轴飞行器到地面控制站（GCS）到四轴飞行器：
 
 好吧，我承认，这变得更有趣了。但这其实容易得多。事实上，GCS系统只是你和直升机之间的中介物，它反过来从直升机获取数据，并显示在GCS系统上。
